@@ -10,6 +10,7 @@ class UsuarioCrear(BaseModel):
     email: EmailStr  # Valida automáticamente que sea un correo real
     password: str
     rol: str
+    gemini_api_key: Optional[str] = None
 
 # 2. Molde para los datos que devolvemos (¡Sin la contraseña!)
 class UsuarioRespuesta(BaseModel):

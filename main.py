@@ -1,16 +1,135 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+import traceback
+import os
+from dotenv import load_dotenv
+
+# Importaciones de nuestros módulos internos de Vaharca
 from database.connection import get_db
+import database.models as models
+import schemas
+from security import get_password_hash
+from gemini_service import generar_leccion_ia
 
-# Creamos la aplicación FastAPI
-app = FastAPI(title="API de Vaharca")
+# Cargar variables de entorno (si usas el archivo .env)
+load_dotenv()
 
-# Ruta de prueba básica (Para ver si el servidor enciende)
+# Inicializar la aplicación FastAPI
+app = FastAPI(title="API de Vaharca", version="1.0.0")
+
+
+# ==========================================
+# RUTAS DE ESTADO Y DIAGNÓSTICO
+# ==========================================
+
 @app.get("/")
-def ruta_principal():
+async def root():
     return {"mensaje": "¡El servidor de Vaharca está encendido y funcionando!"}
 
-# Ruta para probar que la base de datos se conectó correctamente
-@app.get("/test-db")
-def probar_base_datos(db: Session = Depends(get_db)):
-    return {"mensaje": "¡Conexión a PostgreSQL en la base de datos vaharca_db exitosa!"}
+@app.get("/test-connection")
+async def test_connection():
+    """Endpoint simple para verificar que el servidor funciona"""
+    return {
+        "status": "online",
+        "message": "Servidor funcionando correctamente"
+    }
+
+
+# ==========================================
+# RUTAS DE USUARIOS Y SEGURIDAD (FASE 3)
+# ==========================================
+
+@app.post("/registro", response_model=schemas.UsuarioRespuesta)
+async def registrar_usuario(usuario: schemas.UsuarioCrear, db: Session = Depends(get_db)):
+    """
+    Registra un nuevo usuario en la base de datos encriptando su contraseña.
+    Devuelve los datos del usuario usando el esquema seguro (sin la contraseña).
+    """
+    # 1. Verificar si el correo ya existe
+    usuario_existente = db.query(models.Usuario).filter(models.Usuario.email == usuario.email).first()
+    if usuario_existente:
+        raise HTTPException(status_code=400, detail="El correo ya está registrado.")
+    
+    # 2. Encriptar la contraseña
+    password_encriptada = get_password_hash(usuario.password)
+    
+    # 3. Crear el nuevo registro
+    nuevo_usuario = models.Usuario(
+        nombre=usuario.nombre,
+        email=usuario.email,
+        password_hash=password_encriptada,
+        rol=usuario.rol,
+        gemini_api_key=usuario.gemini_api_key
+    )
+    
+    # 4. Guardar en PostgreSQL
+    try:
+        db.add(nuevo_usuario)
+        db.commit()
+        db.refresh(nuevo_usuario)
+        return nuevo_usuario # FastAPI automáticamente lo pasa por UsuarioRespuesta
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error al guardar en BD: {str(e)}")
+
+
+# ==========================================
+# RUTAS DE INTELIGENCIA ARTIFICIAL (FASE 2)
+# ==========================================
+
+@app.get("/test-gemini")
+async def test_gemini(
+    api_key: str = Query(None),
+    tema: str = Query(...),
+    nivel: str = Query(...),
+    tipo: str = Query(...)
+):
+    """Endpoint para generar lecciones usando Gemini"""
+    try:
+        # Usar API key del parámetro o del .env
+        key = api_key or os.getenv("GOOGLE_API_KEY")
+        if not key:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "No se proporcionó API key válida"}
+            )
+        
+        # Llamar a nuestro servicio de IA
+        resultado = generar_leccion_ia(key, tema, nivel, tipo)
+        
+        if "error" in resultado:
+            return JSONResponse(status_code=500, content=resultado)
+            
+        return JSONResponse(content={"status": "success", "data": resultado})
+        
+    except Exception as e:
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Error interno", "detalle": str(e)}
+        )
+
+@app.get("/list-gemini-models")
+async def list_gemini_models(api_key: str = Query(None)):
+    """Lista los modelos disponibles de Gemini para depuración"""
+    try:
+        import google.generativeai as genai
+        key = api_key or os.getenv("GOOGLE_API_KEY")
+        if not key:
+            return JSONResponse(status_code=400, content={"error": "Falta API key"})
+            
+        genai.configure(api_key=key)
+        modelos = [
+            {"name": model.name, "display_name": model.display_name} 
+            for model in genai.list_models() 
+            if 'generateContent' in model.supported_generation_methods
+        ]
+        
+        return JSONResponse(content={
+            "total": len(modelos),
+            "modelos": modelos,
+            "recomendacion": "Usa 'gemini-2.0-flash' o 'gemini-flash-latest' para mejor compatibilidad"
+        })
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})

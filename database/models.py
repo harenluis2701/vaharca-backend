@@ -13,6 +13,7 @@ class Usuario(Base):
     email = Column(String(150), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     rol = Column(String(20), nullable=False) 
+    gemini_api_key = Column(String(255), nullable=True)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
 
     # Relaciones con otras tablas
