@@ -34,6 +34,11 @@ origenes_permitidos = [
     "http://localhost:3000"     # Por si acaso usas otro puerto más adelante
 ]
 
+# Agregar el dominio de producción si existe en las variables de entorno
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    origenes_permitidos.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origenes_permitidos, # Permite a estos dominios hablar con el backend
