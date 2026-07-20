@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.orm import Session
-from database.connection import get_db
+from database.connection import get_db, engine
 import database.models as models
 import schemas
 
@@ -21,6 +21,9 @@ from gemini_service import generar_leccion_ia, evaluar_respuesta_ia
 
 # Cargar variables de entorno (si usas el archivo .env)
 load_dotenv()
+
+# Crear las tablas en la base de datos automáticamente si no existen
+models.Base.metadata.create_all(bind=engine)
 
 # Inicializar la aplicación FastAPI
 app = FastAPI(title="API de Vaharca", version="1.0.0")
