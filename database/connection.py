@@ -11,9 +11,11 @@ database_url = os.getenv("DATABASE_URL")
 
 if database_url:
     # 3a. Usar la URL directa
-    # Nota: A veces las URLs de Postgres empiezan con postgres:// en lugar de postgresql://
+    # Asegurarnos de usar pg8000 sin importar si viene como postgres:// o postgresql://
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql+pg8000://", 1)
+    elif database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+pg8000://", 1)
     URL_BASE_DATOS = database_url
 else:
     # 3b. Armar la URL desde variables individuales (entorno local)
