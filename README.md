@@ -1,122 +1,160 @@
-# Vaharca 🚀
+# VAHARCA
 
-Vaharca es una plataforma web full-stack diseñada para la enseñanza y evaluación asistida por Inteligencia Artificial (Google Gemini). La aplicación cuenta con un backend robusto y de alto rendimiento en Python y un frontend ligero y rápido.
+Vaharca is a full-stack web platform designed for AI-assisted teaching and assessment using Google Gemini. The application features a robust, high-performance Python backend and a lightweight, fast frontend.
 
-## 🛠️ Stack Tecnológico
+## Technology Stack
 
 ### Backend
-* **Framework:** [FastAPI](https://fastapi.tiangolo.com/) (Python)
-* **Base de Datos:** PostgreSQL
-* **ORM:** SQLAlchemy (usando `pg8000` como driver)
-* **Autenticación:** JWT (JSON Web Tokens)
-* **IA:** Google Gemini API (para generación de contenido y evaluación)
+- **Framework:** FastAPI (Python)
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy (using `pg8000` as the driver)
+- **Authentication:** JWT (JSON Web Tokens)
+- **AI:** Google Gemini API (for content generation and evaluation)
 
 ### Frontend
-* **Core:** Vanilla JavaScript (ES6+), HTML5, CSS3
-* **Build Tool:** [Vite](https://vitejs.dev/)
+- **Core:** Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Build Tool:** Vite
 
 ---
 
-## 📁 Estructura del Proyecto
+## Project Structure
 
-El proyecto está organizado en una arquitectura de monorepo separando claramente la lógica del servidor de la interfaz de usuario:
+The project is organized as a monorepo with a clear separation between the server-side logic and the user interface.
 
 ```text
 vaharca-backend/
-├── main.py                 # Punto de entrada de la API (FastAPI) y rutas principales
-├── gemini_service.py       # Lógica de integración con la API de Google Gemini
-├── security.py             # Utilidades de seguridad (Hashing de contraseñas, JWT)
-├── schemas.py              # Definición de esquemas Pydantic para validación de datos
-├── database/               # Configuración y modelos de la Base de Datos
-│   ├── connection.py       # Conexión a PostgreSQL
-│   └── models.py           # Modelos ORM de SQLAlchemy
-├── frontend/               # Código fuente del Frontend
-│   ├── index.html          # Punto de entrada HTML
-│   ├── package.json        # Dependencias de Vite
-│   ├── vite.config.js      # Configuración de compilación de Vite
-│   ├── src/                # Lógica de la interfaz, componentes y vistas en Vanilla JS
-│   └── css/                # Estilos personalizados
-├── .env                    # Variables de entorno (API Keys, Credenciales de DB)
-└── requirements.txt        # Dependencias de Python (si aplica, o Pipfile)
+├── main.py                 # FastAPI entry point and main API routes
+├── gemini_service.py       # Google Gemini API integration logic
+├── security.py             # Security utilities (password hashing and JWT)
+├── schemas.py              # Pydantic schemas for data validation
+├── database/
+│   ├── connection.py       # PostgreSQL connection
+│   └── models.py           # SQLAlchemy ORM models
+├── frontend/
+│   ├── index.html          # HTML entry point
+│   ├── package.json        # Vite dependencies
+│   ├── vite.config.js      # Vite build configuration
+│   ├── src/                # UI logic, components, and views in Vanilla JavaScript
+│   └── css/                # Custom styles
+├── .env                    # Environment variables (API keys and database credentials)
+└── requirements.txt        # Python dependencies
 ```
 
 ---
 
-## 🚀 Instalación y Configuración Local
+# Local Installation and Setup
 
-Para ejecutar este proyecto en tu máquina local, sigue estos pasos:
+To run this project locally, follow these steps.
 
-### 1. Prerrequisitos
-* Python 3.10 o superior
-* Node.js (versión 18+)
-* PostgreSQL instalado y en ejecución
+## Prerequisites
 
-### 2. Configuración del Backend
+- Python 3.10 or later
+- Node.js 18 or later
+- PostgreSQL installed and running
 
-1. **Clonar el repositorio y navegar a la carpeta:**
-   ```bash
-   git clone <url-del-repo>
-   cd vaharca-backend
-   ```
+## Backend Setup
 
-2. **Crear y activar un entorno virtual:**
-   ```bash
-   python -m venv venv
-   # En Windows:
-   venv\Scripts\activate
-   # En macOS/Linux:
-   source venv/bin/activate
-   ```
+### 1. Clone the repository
 
-3. **Instalar dependencias:**
-   Asegúrate de instalar los paquetes necesarios (FastAPI, Uvicorn, SQLAlchemy, psycopg2/pg8000, PyJWT, python-dotenv, google-generativeai).
-   ```bash
-   pip install fastapi uvicorn sqlalchemy pg8000 pyjwt python-dotenv google-generativeai
-   ```
+```bash
+git clone <repository-url>
+cd vaharca-backend
+```
 
-4. **Variables de Entorno (.env):**
-   Crea un archivo `.env` en la raíz del proyecto con la siguiente estructura:
-   ```env
-   DB_USER=tu_usuario_postgres
-   DB_PASSWORD=tu_password
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_NAME=nombre_de_tu_bd
-   ```
-   *(Nota: La API Key de Gemini se configura dinámicamente desde el panel de administrador en el frontend).*
+### 2. Create and activate a virtual environment
 
-5. **Ejecutar el Servidor:**
-   ```bash
-   uvicorn main:app --reload
-   ```
-   La API estará disponible en `http://localhost:8000`. Puedes ver la documentación interactiva en `http://localhost:8000/docs`.
+```bash
+python -m venv venv
 
-### 3. Configuración del Frontend
+# Windows
+venv\Scripts\activate
 
-1. **Abrir una nueva terminal y navegar al frontend:**
-   ```bash
-   cd vaharca-backend/frontend
-   ```
+# macOS / Linux
+source venv/bin/activate
+```
 
-2. **Instalar dependencias de Node:**
-   ```bash
-   npm install
-   ```
+### 3. Install dependencies
 
-3. **Ejecutar el servidor de desarrollo Vite:**
-   ```bash
-   npm run dev
-   ```
-   La aplicación web estará disponible, por defecto, en `http://localhost:5173`.
+```bash
+pip install fastapi uvicorn sqlalchemy pg8000 pyjwt python-dotenv google-generativeai
+```
+
+### 4. Create the `.env` file
+
+```env
+DB_USER=your_postgres_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=your_database_name
+```
+
+> **Note:** The Gemini API key is configured dynamically through the administrator panel in the frontend.
+
+### 5. Start the backend
+
+```bash
+uvicorn main:app --reload
+```
+
+The API will be available at:
+
+```
+http://localhost:8000
+```
+
+Interactive API documentation:
+
+```
+http://localhost:8000/docs
+```
 
 ---
 
-## ⚙️ ¿Cómo funciona?
+## Frontend Setup
 
-1. **Autenticación:** Los usuarios se registran e inician sesión. El backend valida las credenciales y devuelve un token JWT que el frontend almacena y envía en las cabeceras (`Authorization: Bearer <token>`) para rutas protegidas.
-2. **Generación de Lecciones:** Un usuario con permisos puede solicitar a la IA la creación de una lección. El frontend envía la petición al backend, y `gemini_service.py` se comunica con Google Gemini usando la API Key configurada.
-3. **Persistencia:** Todos los datos de usuarios, lecciones y progresos se guardan en PostgreSQL a través de SQLAlchemy, garantizando integridad relacional.
-4. **CORS:** El backend (FastAPI) está configurado para aceptar peticiones originadas desde el puerto de desarrollo de Vite (5173).
+### 1. Navigate to the frontend folder
 
+```bash
+cd vaharca-backend/frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+The frontend will be available at:
+
+```
+http://localhost:5173
+```
+
+---
+
+# How It Works
+
+### Authentication
+
+Users register and log in through the application. The backend validates the credentials and returns a JWT token. The frontend stores this token and includes it in the `Authorization: Bearer <token>` header when accessing protected endpoints.
+
+### AI Lesson Generation
+
+Authorized users can request AI-generated lessons. The frontend sends the request to the backend, where `gemini_service.py` communicates with Google Gemini using the API key configured by the administrator.
+
+### Data Persistence
+
+All users, lessons, assessments, and progress are stored in PostgreSQL using SQLAlchemy, ensuring relational integrity and efficient data management.
+
+### CORS
+
+The FastAPI backend is configured to accept requests from the Vite development server running on port `5173`.
 ## 🛡️ Licencia
 Este proyecto es privado/propietario.
