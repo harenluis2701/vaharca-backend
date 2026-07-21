@@ -156,7 +156,7 @@ All users, lessons, assessments, and progress are stored in PostgreSQL using SQL
 ### CORS
 
 The FastAPI backend is configured to accept requests from the Vite development server running on port `5173`.
----
+
 
 ## License
 
